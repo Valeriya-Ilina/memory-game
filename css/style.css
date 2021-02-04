@@ -1,3 +1,38 @@
-body {
-  background-color: grey;
+#container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+
 }
+
+.card {
+	height: 150px;
+	width: 100px;
+	background-color: yellow;
+	border: 1px solid green;
+	margin: 5px;
+	flex-basis: 110px;
+}
+
+div {
+	border: 1px solid black;
+}
+
+.player {
+	background: orange;
+	border: 1px solid green;
+	height: 70px;
+	width: 100px;
+}
+
+#game-rules {
+	background: lightblue;
+	border: 1px solid green;
+	height: 70px;
+	width: 100px;
+}
+
+
+
+
+
