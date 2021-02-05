@@ -18,7 +18,7 @@ div {
 	border: 1px solid black;
 }
 
-.player {
+#start-game {
 	background: orange;
 	border: 1px solid green;
 	height: 70px;

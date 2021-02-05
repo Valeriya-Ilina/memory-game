@@ -38,10 +38,21 @@ $(() => {
 		if (i === 14){
 			$div.text('FIND PAIRS')
 		}
-
-
-
-
 	}
 
+	$('#start-game').on('click', () => {
+		//get the value of the input
+		let name = $('#input-box').val()
+
+		//if user doesn't provide a name, name him as a "player"
+		if (!name) {
+			name = "Player"
+		}
+		console.log(name)
+
+		//when user clicks on "start game" the 1 st page should change
+		$('#first-page').detach()
+
+		alert(`Welcome ${name}! Get ready to play!`)
+	})
 })
