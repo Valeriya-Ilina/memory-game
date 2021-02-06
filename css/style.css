@@ -8,10 +8,39 @@
 .card {
 	height: 150px;
 	width: 100px;
-	background-color: yellow;
 	border: 1px solid green;
 	margin: 5px;
 	flex-basis: 110px;
+	background-color: yellow;
+}
+
+.card-animal {
+	height: 150px;
+	width: 100px;
+	border: 1px solid green;
+	margin: 5px;
+	flex-basis: 110px;
+}
+.card-animal > img {
+	display: block;
+}
+
+.card-chamomile {
+	height: 150px;
+	width: 100px;
+	border: 1px solid green;
+	margin: 5px;
+	flex-basis: 110px;
+	background-image: url('/images/oblozhka1051.jpg');
+	background-position: center;
+}
+.card-chamomile > img {
+	display: none;
+}
+
+img {
+	height: 150px;
+	width: 100px;
 }
 
 div {

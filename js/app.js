@@ -1,6 +1,6 @@
 console.log("Memory Game1")
 
-//create cards function
+// 1.create cards function
 const createCard = () => {
 	//create div for the main page
 	const $div = $('<div>')
@@ -10,7 +10,7 @@ const createCard = () => {
 	return $div
 }
 
-//convert timer format to seconds
+// 2.convert timer format to seconds
 const convertTimerToSeconds = (timer) => {
 	//get minutes from string and convert to number
 	const minutes = parseInt(timer.substring(0, 2))
@@ -21,7 +21,7 @@ const convertTimerToSeconds = (timer) => {
 
 }
 
-//convert seconds to timer format
+// 3.convert seconds to timer format
 const convertSecondsToTimer = (seconds) => {
 	//get remainder from total seconds, e.g. 122 % 60 = 2
 	let timerSeconds = seconds % 60
@@ -37,6 +37,26 @@ const convertSecondsToTimer = (seconds) => {
 		timerMinutes = '0' + timerMinutes
 	}
 	return `${timerMinutes}:${timerSeconds}`
+}
+
+// 4.shuffle elements in the array (copied from https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array)
+const shuffle = (array) => {
+  let currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element
+    randomIndex = Math.floor(Math.random() * currentIndex)
+    currentIndex-- 
+
+    // And swap it with the current element
+    temporaryValue = array[currentIndex]
+    array[currentIndex] = array[randomIndex]
+    array[randomIndex] = temporaryValue
+  }
+
+  return array
 }
 
 $(() => {
@@ -98,7 +118,7 @@ $(() => {
 		const $div = $('<div>').text('TIMER')
 		$div.appendTo($divTimerBox)
 
-		const timer = '00:45'
+		const timer = '01:00'
 		const $divTime = $('<div>').text(timer)
 		$divTime.appendTo($divTimerBox)
 
@@ -108,7 +128,7 @@ $(() => {
 		$divTimerBox.on('click', () => {
 			
 			let timeInSeconds = convertTimerToSeconds(timer)
-			
+
 			let interval = setInterval(() => {
 				timeInSeconds--
 				const timer = convertSecondsToTimer(timeInSeconds)
@@ -121,13 +141,59 @@ $(() => {
 			}, 1000)
 		})
 
+		//array of images 
+		const images = ['belka.jpg', 'belka1.jpg', 'bober.jpg', 'busya.jpg', 'enot.jpg', 'ezh.jpg', 'gorilla.jpg', 'kenguru.jpg', 'koshka.jpg', 'krolik.jpg', 'lev.jpg', 'limur.jpg', 'lisa.jpg', 'obezyana.jpg', 'panda.jpg', 'pingvini.jpg', 'sobaka.jpg', 'zhiraf.jpg']
 
-		//create 32 cards for the game
-		for (i = 0; i < 32; i++){
+		//create array of cards with images
+		const cardsToDo = []
+
+		//adding pair to each image and push it to the array 'cardsToDo'
+		for (let i = 0; i < images.length; i++) {
+			const pair1 = images[i]
+			const pair2 = images[i]
+			cardsToDo.push(pair1)
+			cardsToDo.push(pair2)
+		}
+
+		//shuffle array of cardsToDo
+		const shuffledCardsToDo = shuffle(cardsToDo)
+
+		//create array of flipped cards
+		const cardsFlipped = []
+
+		//create game cards for the game
+		for (let i = 0; i < shuffledCardsToDo.length; i++){
+			//create div with card class
 			const $div = createCard()
 
+			//insert image to the div card
+			const $img = $('<img>')
+			$img.attr('src', `/images/${shuffledCardsToDo[i]}`)
+			$img.appendTo($div)
+
+			//replace class 'card' with 'card-chamomile' and append to the div
+			$div.removeClass('card')
+			$div.addClass('card-chamomile')
 			$div.appendTo('#game-container')
 		}
-		//
+
+		//flip card
+		$('.card-chamomile').on('click', (event) => {
+			//change class upon clicking
+			$(event.currentTarget).toggleClass('card-animal')
+			$(event.currentTarget).toggleClass('card-chamomile')
+
+		})
+
 	})
 })
+
+
+
+
+
+
+
+
+
+
