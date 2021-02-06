@@ -32,7 +32,16 @@ div {
 	width: 100px;
 }
 
+#game-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+}
 
-
+#timer {
+	height: 50px;
+	width: 150px;
+	margin: auto;
+}
 
 
