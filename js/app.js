@@ -177,14 +177,46 @@ $(() => {
 			$div.appendTo('#game-container')
 		}
 
+		//create an empty array to hold cards to verify if there is a match between 2 cards 
+		let pairOfCards = []
+
 		//flip card
 		$('.card-chamomile').on('click', (event) => {
 			//change class upon clicking
 			$(event.currentTarget).toggleClass('card-animal')
 			$(event.currentTarget).toggleClass('card-chamomile')
 
-		})
+	 		
+			const checkPair = () => {
+				//get image source to compare
+				const img0src = pairOfCards[0].children().eq(0).attr('src')
+				const img1src = pairOfCards[1].children().eq(0).attr('src')
 
+				if(img0src === img1src) {
+					console.log('Its match')
+				} else {
+					//after 1 sec the unmatched cards should be flipped back
+					const flipCardsBack = (pairOfCards) => {
+						pairOfCards[0].toggleClass('card-chamomile')
+						pairOfCards[1].toggleClass('card-chamomile')
+
+						pairOfCards[0].toggleClass('card-animal')
+						pairOfCards[1].toggleClass('card-animal')
+					}
+					setTimeout(flipCardsBack, 1000, pairOfCards)
+				}
+				//empty array for the next pair comparison
+				pairOfCards = []
+			}
+
+			//add card element to the array for comparison
+			pairOfCards.push($(event.currentTarget))
+
+			//if there are 2 elements in the array, then compare if they match each other 
+			if(pairOfCards.length === 2) {
+				checkPair()
+			}
+		})
 	})
 })
 
