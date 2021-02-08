@@ -59,6 +59,14 @@ const shuffle = (array) => {
   return array
 }
 
+// 5.Check if card is already opened
+const isCardOpen = (cardElement) => {
+	if(cardElement.hasClass('card-animal')) {
+		return true
+	}
+	return false
+}
+
 $(() => {
 	//create 15 cards for the 1st page
 	for (let i = 0; i < 15; i++) {
@@ -180,43 +188,52 @@ $(() => {
 		//create an empty array to hold cards to verify if there is a match between 2 cards 
 		let pairOfCards = []
 
-		//flip card
-		$('.card-chamomile').on('click', (event) => {
-			//change class upon clicking
-			$(event.currentTarget).toggleClass('card-animal')
-			$(event.currentTarget).toggleClass('card-chamomile')
+		const checkPair = () => {
+			//get image source to compare
+			const img0src = pairOfCards[0].children().eq(0).attr('src')
+			const img1src = pairOfCards[1].children().eq(0).attr('src')
 
-	 		
-			const checkPair = () => {
-				//get image source to compare
-				const img0src = pairOfCards[0].children().eq(0).attr('src')
-				const img1src = pairOfCards[1].children().eq(0).attr('src')
+			if(img0src === img1src) {
+				console.log('Its match')
+				//when user finds a pair of cards then user is unable to click on the opened pairs
+				pairOfCards[0].off()
+				pairOfCards[1].off()
+			} else {
+				//after 1 sec the unmatched cards should be flipped back
+				const flipCardsBack = (pairOfCards) => {
+					pairOfCards[0].toggleClass('card-chamomile')
+					pairOfCards[1].toggleClass('card-chamomile')
 
-				if(img0src === img1src) {
-					console.log('Its match')
-				} else {
-					//after 1 sec the unmatched cards should be flipped back
-					const flipCardsBack = (pairOfCards) => {
-						pairOfCards[0].toggleClass('card-chamomile')
-						pairOfCards[1].toggleClass('card-chamomile')
-
-						pairOfCards[0].toggleClass('card-animal')
-						pairOfCards[1].toggleClass('card-animal')
-					}
-					setTimeout(flipCardsBack, 1000, pairOfCards)
+					pairOfCards[0].toggleClass('card-animal')
+					pairOfCards[1].toggleClass('card-animal')
 				}
-				//empty array for the next pair comparison
-				pairOfCards = []
+				setTimeout(flipCardsBack, 1000, pairOfCards)
+			}
+			//empty array for the next pair comparison
+			pairOfCards = []
+		}
+
+		const flipAndCheckCard = (event) => {
+			//condition prevents clicking on the same card twice in a row
+			if(isCardOpen($(event.currentTarget)) === false) {
+				//change class upon clicking
+				$(event.currentTarget).toggleClass('card-animal')
+				$(event.currentTarget).toggleClass('card-chamomile')
+
+				//add card element to the array for comparison
+				pairOfCards.push($(event.currentTarget))
+
+				//if there are 2 elements in the array, then compare if they match each other 
+				if(pairOfCards.length === 2) {
+					checkPair()
+				}
 			}
 
-			//add card element to the array for comparison
-			pairOfCards.push($(event.currentTarget))
+			
+		}
 
-			//if there are 2 elements in the array, then compare if they match each other 
-			if(pairOfCards.length === 2) {
-				checkPair()
-			}
-		})
+		//flip card
+		$('.card-chamomile').on('click', flipAndCheckCard)
 	})
 })
 
