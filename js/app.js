@@ -199,6 +199,13 @@ $(() => {
 				pairOfCards[0].off()
 				pairOfCards[1].off()
 			} else {
+				//get all card elements
+				const listOfCardElements = $('#game-container').children()
+				// temporarily turn off event listeners for all cards to prevent user from clicking while opened pair of cards is still opened 
+				for (let i = 0; i < listOfCardElements.length; i++) {
+					listOfCardElements.eq(i).off()
+				}
+
 				//after 1 sec the unmatched cards should be flipped back
 				const flipCardsBack = (pairOfCards) => {
 					pairOfCards[0].toggleClass('card-chamomile')
@@ -206,6 +213,11 @@ $(() => {
 
 					pairOfCards[0].toggleClass('card-animal')
 					pairOfCards[1].toggleClass('card-animal')
+
+					// turn on event listeners for other cards
+					for (let i = 0; i < listOfCardElements.length; i++) {
+						listOfCardElements.eq(i).on('click', flipAndCheckCard)
+					}
 				}
 				setTimeout(flipCardsBack, 1000, pairOfCards)
 			}
@@ -228,8 +240,6 @@ $(() => {
 					checkPair()
 				}
 			}
-
-			
 		}
 
 		//flip card
