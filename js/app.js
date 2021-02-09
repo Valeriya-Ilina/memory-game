@@ -76,7 +76,9 @@ $(() => {
 		//append div to the container
 		$div.appendTo('#container')
 		if (i === 0 || i === 12){
-			$div.css('background-color', 'purple')
+			const $img = $('<img>')
+			$img.attr('src', '/images/first-page pic.jpg')
+			$img.appendTo($div)
 		}
 		if (i === 1){
 			$div.text('ME')
@@ -126,7 +128,7 @@ $(() => {
 		const $div = $('<div>').text('TIMER')
 		$div.appendTo($divTimerBox)
 
-		const timer = '01:00'
+		const timer = '02:00'
 		const $divTime = $('<div>').text(timer)
 		$divTime.appendTo($divTimerBox)
 
@@ -198,6 +200,11 @@ $(() => {
 				//when user finds a pair of cards then user is unable to click on the opened pairs
 				pairOfCards[0].off()
 				pairOfCards[1].off()
+
+				//add one to openedPairs when user finds a match
+				openedPairs++ //openedPairs = openedPairs + 1
+				$divNumberPairsOpened.text(openedPairs)
+
 			} else {
 				//get all card elements
 				const listOfCardElements = $('#game-container').children()
@@ -241,9 +248,32 @@ $(() => {
 				}
 			}
 		}
-
 		//flip card
 		$('.card-chamomile').on('click', flipAndCheckCard)
+
+		//track opened pairs
+		let totalPairs = cardsToDo.length / 2
+		let openedPairs = 0
+		//create status box
+		const $divStatusBox = $('<div>').attr('id', 'status-box')
+		$divStatusBox.insertAfter($divTimerBox)
+
+		$divTextTotalPairs = $('<div>').text('Total Pairs')
+		$divTextTotalPairs.appendTo($divStatusBox)
+		$divNumberTotalPairs = $('<div>').attr('id', 'number-pairs-left-to-open').text('18')
+		$divNumberTotalPairs.insertAfter($divTextTotalPairs)
+
+		$divTextPairsOpened = $('<div>').text('Opened')
+		$divTextPairsOpened.appendTo($divStatusBox)
+		$divNumberPairsOpened = $('<div>').attr('id', 'number-pairs-opened').text(openedPairs)
+		$divNumberPairsOpened.insertAfter($divTextPairsOpened)
+
+
+		//create 'new game' button
+		const $buttonNewGame = $('<button>').attr('id', 'new-game')
+		$buttonNewGame.text('NEW GAME')
+		$buttonNewGame.insertAfter($divStatusBox)
+
 	})
 })
 

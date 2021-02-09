@@ -11,7 +11,7 @@
 	border: 1px solid green;
 	margin: 5px;
 	flex-basis: 110px;
-	background-color: yellow;
+	background-color: #F7F809;
 }
 
 .card-animal {
@@ -21,6 +21,7 @@
 	margin: 5px;
 	flex-basis: 110px;
 }
+
 .card-animal > img {
 	display: block;
 }
@@ -68,6 +69,18 @@ div {
 }
 
 #timer {
+	height: 50px;
+	width: 150px;
+	margin: auto;
+}
+
+#status-box {
+	height: 150px;
+	width: 150px;
+	margin: auto;
+}
+
+#new-game {
 	height: 50px;
 	width: 150px;
 	margin: auto;
