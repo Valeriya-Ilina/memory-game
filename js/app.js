@@ -107,20 +107,17 @@ $(() => {
 	}
 
 	$('#start-game').on('click', () => {
-		//get the value of the input
-		let name = $('#input-box').val()
-
-		//if user doesn't provide a name, name him as a "player"
-		if (!name) {
-			name = "Player"
-		}
-		console.log(name)
-
 		//when user clicks on "start game" the 1 st page should change
 		$('#first-page').detach()
 
 		//Welcome "player"
-		//alert(`Welcome ${name}! Get ready to play!`)
+		let name = prompt("Hello! Are you ready to play? What's your name?")
+		//if user doesn't provide a name, name him as a "player"
+		if (!name) {
+			name = "Player"
+		}
+
+		alert("Get ready!")
 
 		//create timer text
 		const $divTimerBox = $('<div>').attr('id', 'timer')
@@ -128,19 +125,19 @@ $(() => {
 		const $div = $('<div>').text('TIMER')
 		$div.appendTo($divTimerBox)
 
-		const timer = '02:00'
+		const timer = '00:00'
 		const $divTime = $('<div>').text(timer)
 		$divTime.appendTo($divTimerBox)
 
 		$divTimerBox.prependTo('#game')
 
-		//create timer count down
-		$divTimerBox.on('click', () => {
+		//timer function
+		const startTimer = () => {
 			
 			let timeInSeconds = convertTimerToSeconds(timer)
 
 			let interval = setInterval(() => {
-				timeInSeconds--
+				timeInSeconds++
 				const timer = convertSecondsToTimer(timeInSeconds)
 				$divTime.text(timer)
 
@@ -149,7 +146,9 @@ $(() => {
 					clearInterval(interval)
 				}
 			}, 1000)
-		})
+		}
+
+		startTimer()
 
 		//array of images 
 		const images = ['belka.jpg', 'belka1.jpg', 'bober.jpg', 'busya.jpg', 'enot.jpg', 'ezh.jpg', 'gorilla.jpg', 'kenguru.jpg', 'koshka.jpg', 'krolik.jpg', 'lev.jpg', 'limur.jpg', 'lisa.jpg', 'obezyana.jpg', 'panda.jpg', 'pingvini.jpg', 'sobaka.jpg', 'zhiraf.jpg']
