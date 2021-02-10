@@ -15,6 +15,47 @@ const images = ['belka.jpg', 'belka1.jpg', 'bober.jpg', 'busya.jpg', 'enot.jpg',
 //create array of cards with images
 const cardsToDo = []
 
+//create an object bestScore
+const bestScores = {
+	results: [],
+
+	addResult(name, time) {
+		let resultObject = {
+			name: name,
+			time: time
+		}
+
+		this.sortBestResults()
+		if (this.results.length <= 4 || this.isNewResultFasterThanLastInArray(time)) {
+			this.results.push(resultObject)
+			this.sortBestResults()
+			if(this.results.length > 5) {
+				this.removeWorstResult()
+			}
+		}
+	},
+
+	removeWorstResult() {
+		this.results.pop()
+	},
+
+	isNewResultFasterThanLastInArray(time) {
+		if (this.results.length === 5) {
+			if(convertTimerToSeconds(time) < convertTimerToSeconds(this.results[4].time)) {
+				return true
+			}
+		}
+		return false
+	},
+
+	sortBestResults() {
+		this.results.sort((obj1, obj2) => {
+			return convertTimerToSeconds(obj1.time) - convertTimerToSeconds(obj2.time)
+		})
+	}
+}
+
+
 // Create cards function
 const createCard = () => {
 	//create div for the main page
@@ -197,27 +238,40 @@ const flipAndCheckCard = (event) => {
 	}
 }
 
+
+let interval
 //timer function
 const startTimer = () => {
 	
 	let timeInSeconds = convertTimerToSeconds(timerStartsFrom)
 
-	let interval = setInterval(() => {
+	interval = setInterval(() => {
 		timeInSeconds++
 		const timer = convertSecondsToTimer(timeInSeconds)
 		
 		$('#time').text(timer)
 
-		//if time is out, stop timer
-		if(!timeInSeconds) {
-			clearInterval(interval)
-		}
 	}, 1000)
+	console.log(interval)
 }
 
+// check if all pairs are opened 
+const checkEndGame = () => {
+	if (openedPairs === cardsToDo.length / 2) {
+		return true
+	} 
+	return false 
+}
 
+const freezeAllCards = () => {
+	//get all card elements
+	const listOfCardElements = $('#game-container').children()
+	// temporarily turn off event listeners for all cards to prevent user from clicking while opened pair of cards is still opened 
+	for (let i = 0; i < listOfCardElements.length; i++) {
+		listOfCardElements.eq(i).off()
+	}
+}
 
-// 
 const checkPair = () => {
 	//get image source to compare
 	const img0src = pairOfCards[0].children().eq(0).attr('src')
@@ -233,13 +287,16 @@ const checkPair = () => {
 		openedPairs++ //openedPairs = openedPairs + 1
 		$divNumberPairsOpened.text(openedPairs)
 
-	} else {
-		//get all card elements
-		const listOfCardElements = $('#game-container').children()
-		// temporarily turn off event listeners for all cards to prevent user from clicking while opened pair of cards is still opened 
-		for (let i = 0; i < listOfCardElements.length; i++) {
-			listOfCardElements.eq(i).off()
+		if (checkEndGame()) {
+			clearInterval(interval)
+			let timeResult = $('#time').text()
+			bestScores.addResult(name, timeResult)
+			freezeAllCards()
+			console.log(bestScores)
 		}
+
+	} else {
+		freezeAllCards()
 
 		//after 1 sec the unmatched cards should be flipped back
 		const flipCardsBack = (pairOfCards) => {
@@ -249,6 +306,8 @@ const checkPair = () => {
 			pairOfCards[0].toggleClass('card-animal')
 			pairOfCards[1].toggleClass('card-animal')
 
+			//get all card elements
+			const listOfCardElements = $('#game-container').children()
 			// turn on event listeners for other cards
 			for (let i = 0; i < listOfCardElements.length; i++) {
 				listOfCardElements.eq(i).on('click', flipAndCheckCard)
@@ -260,8 +319,7 @@ const checkPair = () => {
 	pairOfCards = []
 }
 
-
-
+let name
 $(() => {
 	generateMainPageCards()
 
@@ -270,7 +328,7 @@ $(() => {
 		$('#first-page').detach()
 
 		//Welcome player
-		let name = prompt("Hello! Are you ready to play? What's your name?")
+		name = prompt("Hello! Are you ready to play? What's your name?")
 		//if user doesn't provide a name, name him as a "player"
 		if (!name) {
 			name = "Player"
