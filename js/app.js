@@ -13,12 +13,15 @@ const timerStartsFrom = '00:00'
 const images = ['belka.jpg', 'belka1.jpg', 'bober.jpg', 'busya.jpg', 'enot.jpg', 'ezh.jpg', 'gorilla.jpg', 'kenguru.jpg', 'koshka.jpg', 'krolik.jpg', 'lev.jpg', 'limur.jpg', 'lisa.jpg', 'obezyana.jpg', 'panda.jpg', 'pingvini.jpg', 'sobaka.jpg', 'zhiraf.jpg']
 
 //create array of cards with images
-const cardsToDo = []
+let cardsToDo = []
 
 
 //create an object bestScore
 const bestScores = {
-	results: [],
+	results: [
+		{name: 'Andre', time: '06:45'},
+		{name: 'Sandra', time: '02:50'}
+	],
 
 	addResult(name, time) {
 		let resultObject = {
@@ -225,7 +228,7 @@ const generateNewGameButton = () => {
 const generateBestScoreBox = () => {
 	const $divBestScore = $('<div>').attr('id', 'best-scores')
 	$divBestScore.text('BEST SCORES')
-	$divBestScore.appendTo($('#game'))
+	$divBestScore.appendTo($('body'))
 
 	//create table in best score box
 	$divBestScore.append("<table>")
@@ -324,6 +327,8 @@ const checkPair = () => {
 			freezeAllCards()
 			console.log(bestScores)
 
+			alert(`Good job, ${name}, you found all pairs in ${timeResult}`)
+
 			// remove best scores and re-populate the table
 			$('#best-scores').remove()
 			generateBestScoreBox()
@@ -353,6 +358,68 @@ const checkPair = () => {
 	pairOfCards = []
 }
 
+const startNewGame = () => {
+	//Welcome player
+	name = prompt("Hello! Are you ready to play? What's your name?")
+	//if user doesn't provide a name, name him as a "player"
+	if (!name) {
+		name = "Player"
+	}
+
+	alert("Get ready!")
+
+	//adding pair to each image and push it to the array 'cardsToDo'
+	for (let i = 0; i < images.length; i++) {
+		const card1 = images[i]
+		const card2 = images[i]
+		cardsToDo.push(card1)
+		cardsToDo.push(card2)
+	}
+
+	//shuffle array of cardsToDo
+	const shuffledCardsToDo = shuffle(cardsToDo)
+
+	generateGameCards(shuffledCardsToDo)
+	
+	//get total pairs amount
+	let numOfPairs = images.length
+
+	generateTimer()
+	generateStatusBox(numOfPairs)
+	generateNewGameButton()
+	
+	startTimer()
+
+	//flip card
+	$('.card-chamomile').on('click', flipAndCheckCard)
+
+	$('#new-game').on('click', restartGame)
+}
+
+
+
+const restartGame = () => {
+	// stop timer
+	clearInterval(interval)
+	// clear all elements except best scores
+	$('#timer').remove()
+	$('#status-box').remove()
+	$('#new-game').remove()
+	$('#game-container').children().remove()
+
+
+	// clear cardsToDo array and other variables
+	cardsToDo = []
+	pairOfCards = []
+	shuffledCardsToDo = []
+	openedPairs = 0
+	
+	// generate new game, start new timer
+	startNewGame()
+}
+
+
+
 let name
 $(() => {
 	generateMainPageCards()
@@ -361,41 +428,8 @@ $(() => {
 		//when user clicks on "start game" the 1 st page should change
 		$('#first-page').remove()
 
-		//Welcome player
-		name = prompt("Hello! Are you ready to play? What's your name?")
-		//if user doesn't provide a name, name him as a "player"
-		if (!name) {
-			name = "Player"
-		}
-
-		alert("Get ready!")
-
-		//adding pair to each image and push it to the array 'cardsToDo'
-		for (let i = 0; i < images.length; i++) {
-			const card1 = images[i]
-			const card2 = images[i]
-			cardsToDo.push(card1)
-			cardsToDo.push(card2)
-		}
-
-		//shuffle array of cardsToDo
-		const shuffledCardsToDo = shuffle(cardsToDo)
-
-		generateGameCards(shuffledCardsToDo)
-		
-		//get total pairs amount
-		let numOfPairs = images.length
-
-		generateTimer()
-		generateStatusBox(numOfPairs)
-		generateNewGameButton()
 		generateBestScoreBox()
-		
-		startTimer()
-
-		//flip card
-		$('.card-chamomile').on('click', flipAndCheckCard)
-
+		startNewGame()
 
 	})
 })
