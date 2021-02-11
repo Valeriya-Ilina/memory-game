@@ -1,7 +1,7 @@
 #container {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-around;
+	justify-content: space-evenly;
 
 }
 
@@ -40,8 +40,13 @@
 }
 
 img {
-	height: 150px;
-	width: 100px;
+	height: 149px;
+	width: 109px;
+    border: solid 1px #000;
+    margin-right: 20px;
+    margin-bottom: 50px;
+    background-position: center;
+    
 }
 
 div {

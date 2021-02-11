@@ -15,6 +15,7 @@ const images = ['belka.jpg', 'belka1.jpg', 'bober.jpg', 'busya.jpg', 'enot.jpg',
 //create array of cards with images
 const cardsToDo = []
 
+
 //create an object bestScore
 const bestScores = {
 	results: [],
@@ -220,6 +221,35 @@ const generateNewGameButton = () => {
 	$buttonNewGame.insertAfter($divStatusBox)
 }
 
+//create best score box
+const generateBestScoreBox = () => {
+	const $divBestScore = $('<div>').attr('id', 'best-scores')
+	$divBestScore.text('BEST SCORES')
+	$divBestScore.appendTo($('#game'))
+
+	//create table in best score box
+	$divBestScore.append("<table>")
+	$('table').append("<thead>")
+	$('thead').append('<tr>')
+	$('tr').append('<th> </th>')
+	$('tr').append('<th>Name:</th>')
+	$('tr').append('<th>Time:</th>')
+	$('table').append('<tbody>')
+
+	console.log(bestScores.results)
+	scores = bestScores.sortBestResults()
+	console.log(bestScores.results)
+	for(let i = 0; i < bestScores.results.length; i++) {
+		$('tbody').append('<tr>')
+		// append to specific element in array of elements returned from $('tbody tr')
+		$('tbody tr').eq(i).append(`<td>${i+1}.</td>`) // insert into tbody tr
+		$('tbody tr').eq(i).append(`<td>${bestScores.results[i].name}</td>`) 
+		$('tbody tr').eq(i).append(`<td>${bestScores.results[i].time}</td>`)
+	}
+	 
+}
+
+
 // Flip card and check if they match
 const flipAndCheckCard = (event) => {
 	//condition prevents clicking on the same card twice in a row
@@ -293,6 +323,10 @@ const checkPair = () => {
 			bestScores.addResult(name, timeResult)
 			freezeAllCards()
 			console.log(bestScores)
+
+			// remove best scores and re-populate the table
+			$('#best-scores').remove()
+			generateBestScoreBox()
 		}
 
 	} else {
@@ -325,7 +359,7 @@ $(() => {
 
 	$('#start-game').on('click', () => {
 		//when user clicks on "start game" the 1 st page should change
-		$('#first-page').detach()
+		$('#first-page').remove()
 
 		//Welcome player
 		name = prompt("Hello! Are you ready to play? What's your name?")
@@ -355,6 +389,7 @@ $(() => {
 		generateTimer()
 		generateStatusBox(numOfPairs)
 		generateNewGameButton()
+		generateBestScoreBox()
 		
 		startTimer()
 
