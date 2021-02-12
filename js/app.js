@@ -1,5 +1,8 @@
 console.log("Memory Game1")
 
+//track user name
+let name
+
 //create an empty array to hold cards to verify if there is a match between 2 cards 
 let pairOfCards = []
 
@@ -20,7 +23,8 @@ let cardsToDo = []
 const bestScores = {
 	results: [
 		{name: 'Andre', time: '06:45'},
-		{name: 'Sandra', time: '02:50'}
+		{name: 'Sandra', time: '02:50'},
+		{name: 'Alexander-Arnold', time: '01:50'}
 	],
 
 	addResult(name, time) {
@@ -134,8 +138,8 @@ const generateMainPageCards = () => {
 
 		const $div = createCard()
 
-		//append div to the container
-		$div.appendTo('#container')
+		//append div to the first-page-cards-container
+		$div.appendTo('#first-page-cards-container')
 		if (i === 0 || i === 12){
 			const $img = $('<img>')
 			$img.attr('src', '/images/first-page pic.jpg')
@@ -176,6 +180,7 @@ const generateGameCards = (shuffledCardsToDo) => {
 
 		//insert image to the div card
 		const $img = $('<img>')
+		//set attribute to the image to find a file in images folder
 		$img.attr('src', `/images/${shuffledCardsToDo[i]}`)
 		$img.appendTo($div)
 
@@ -190,7 +195,7 @@ const generateStatusBox = (numOfPairs) => {
 	//create status box
 	const $divStatusBox = $('<div>').attr('id', 'status-box')
 	$divTimerBox = $('#timer')
-	$divStatusBox.insertAfter($divTimerBox)
+	$divStatusBox.appendTo($('#side-box'))
 
 	$divTextTotalPairs = $('<div>').text('Total Pairs')
 	$divTextTotalPairs.appendTo($divStatusBox)
@@ -228,7 +233,7 @@ const generateNewGameButton = () => {
 const generateBestScoreBox = () => {
 	const $divBestScore = $('<div>').attr('id', 'best-scores')
 	$divBestScore.text('BEST SCORES')
-	$divBestScore.appendTo($('body'))
+	$divBestScore.appendTo($('#side-box'))
 
 	//create table in best score box
 	$divBestScore.append("<table>")
@@ -257,6 +262,7 @@ const generateBestScoreBox = () => {
 const flipAndCheckCard = (event) => {
 	//condition prevents clicking on the same card twice in a row
 	if(isCardOpen($(event.currentTarget)) === false) {
+		console.log($(event.currentTarget))
 		//change class upon clicking
 		$(event.currentTarget).toggleClass('card-animal')
 		$(event.currentTarget).toggleClass('card-chamomile')
@@ -307,8 +313,8 @@ const freezeAllCards = () => {
 
 const checkPair = () => {
 	//get image source to compare
-	const img0src = pairOfCards[0].children().eq(0).attr('src')
-	const img1src = pairOfCards[1].children().eq(0).attr('src')
+	const img0src = pairOfCards[0].children().attr('src')
+	const img1src = pairOfCards[1].children().attr('src')
 
 	if(img0src === img1src) {
 		console.log('Its match')
@@ -327,7 +333,7 @@ const checkPair = () => {
 			freezeAllCards()
 			console.log(bestScores)
 
-			alert(`Good job, ${name}, you found all pairs in ${timeResult}`)
+			Swal.fire(`Good job, ${name}! You found all pairs in ${timeResult}`)
 
 			// remove best scores and re-populate the table
 			$('#best-scores').remove()
@@ -360,13 +366,14 @@ const checkPair = () => {
 
 const startNewGame = () => {
 	//Welcome player
-	name = prompt("Hello! Are you ready to play? What's your name?")
+	// name = prompt("Hello! Are you ready to play? What's your name?")
 	//if user doesn't provide a name, name him as a "player"
 	if (!name) {
 		name = "Player"
 	}
 
-	alert("Get ready!")
+	// alert(`Get ready, ${name}!`)
+
 
 	//adding pair to each image and push it to the array 'cardsToDo'
 	for (let i = 0; i < images.length; i++) {
@@ -420,8 +427,15 @@ const restartGame = () => {
 
 
 
-let name
 $(() => {
+	
+	$('#game-rules').on('click', () => {
+		Swal.fire({
+		  title: "Game rules",
+		  text: "You've got 36 cards and need to find pairs"
+		})
+	})
+
 	generateMainPageCards()
 
 	$('#start-game').on('click', () => {
