@@ -4,19 +4,21 @@ console.log("Memory Game")
 let name
 
 //create an empty array to hold cards to verify if there is a match between 2 cards 
-let pairOfCards = []
+let arrayPairOfCards = []
 
 //track opened pairs
 let openedPairs = 0
 
-// timer
+//timer
 const timerStartsFrom = '00:00'
+let interval
 
 //array of images 
 const images = ['belka.jpg', 'belka1.jpg', 'bober.jpg', 'busya.jpg', 'enot.jpg', 'ezh.jpg', 'gorilla.jpg', 'kenguru.jpg', 'koshka.jpg', 'krolik.jpg', 'lev.jpg', 'limur.jpg', 'lisa.jpg', 'obezyana.jpg', 'panda.jpg', 'pingvini.jpg', 'sobaka.jpg', 'zhiraf.jpg']
 
-//create array of cards with images
-let cardsToDo = []
+//create array of cards with image pairs (each image doubles)
+let arrayOfImagePairs = []
+
 
 
 //create an object bestScore
@@ -36,6 +38,7 @@ const bestScores = {
 
 		this.sortBestResults()
 		if (this.results.length <= 5 || this.isNewResultFasterThanFifthInArray(time)) {
+			// add resultObject with name and time to results array
 			this.results.push(resultObject)
 			this.sortBestResults()
 			if(this.results.length > 5) {
@@ -45,7 +48,8 @@ const bestScores = {
 	},
 
 	removeWorstResult() {
-		this.results.pop()
+		// remove last element
+		this.results.pop() 
 	},
 
 	isNewResultFasterThanFifthInArray(time) {
@@ -65,16 +69,6 @@ const bestScores = {
 }
 
 
-// Create cards function
-const createCard = () => {
-	//create div for the main page
-	const $div = $('<div>')
-
-	//add a class card to the div
-	$div.addClass('card')
-	return $div
-}
-
 // Convert timer format to seconds
 const convertTimerToSeconds = (timer) => {
 	//get minutes from string and convert to number
@@ -85,6 +79,7 @@ const convertTimerToSeconds = (timer) => {
 	return minutes * 60 + seconds
 
 }
+
 
 // Convert seconds to timer format
 const convertSecondsToTimer = (seconds) => {
@@ -103,6 +98,7 @@ const convertSecondsToTimer = (seconds) => {
 	}
 	return `${timerMinutes}:${timerSeconds}`
 }
+
 
 // Shuffle elements in the array (copied from https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array)
 const shuffle = (array) => {
@@ -124,6 +120,7 @@ const shuffle = (array) => {
   return array
 }
 
+
 // Check if card is already opened
 const isCardOpen = (cardElement) => {
 	if(cardElement.hasClass('card-animal')) {
@@ -132,12 +129,205 @@ const isCardOpen = (cardElement) => {
 	return false
 }
 
+
+// Flip card and check if they match
+const flipAndCheckCard = (event) => {
+	//condition prevents clicking on the same card twice in a row
+	if(isCardOpen($(event.currentTarget)) === false) {
+		//change class upon clicking
+		$(event.currentTarget).toggleClass('card-animal')
+		$(event.currentTarget).toggleClass('card-chamomile')
+
+		//add card element to the array for comparison
+		arrayPairOfCards.push($(event.currentTarget))
+
+		//if there are 2 elements in the array, then compare if they match each other 
+		if(arrayPairOfCards.length === 2) {
+			checkPair()
+		}
+	}
+}
+
+
+const freezeAllCards = () => {
+	//get all card elements
+	const listOfCardElements = $('#game-container').children()
+	// temporarily turn off event listeners for all cards to prevent user from clicking while opened pair of cards is still opened 
+	for (let i = 0; i < listOfCardElements.length; i++) {
+		listOfCardElements.eq(i).off()
+	}
+}
+
+
+// check if all pairs are opened 
+const isGameFinished = () => {
+	if (openedPairs === arrayOfImagePairs.length / 2) {
+		return true
+	} 
+	return false 
+}
+
+
+const checkPair = () => {
+	//get image source to compare
+	const img0src = arrayPairOfCards[0].children().attr('src')
+	const img1src = arrayPairOfCards[1].children().attr('src')
+
+	if(img0src === img1src) {
+		console.log('Its match')
+		//when user finds a pair of cards then user is unable to click on the opened pairs
+		arrayPairOfCards[0].off()
+		arrayPairOfCards[1].off()
+
+		//add one to openedPairs when user finds a match
+		openedPairs++ //openedPairs = openedPairs + 1
+		// update text inside element on a page, e.g. 1
+		$divNumberPairsOpened.text(openedPairs)
+
+		if (isGameFinished() === true) {
+			// stop timer
+			clearInterval(interval)
+
+			// get timer value from the page
+			let timeResult = $('#time').text()
+
+			// add user's name and time to bestScores
+			bestScores.addResult(name, timeResult)
+
+			freezeAllCards()
+
+			// popup
+			Swal.fire(`Good job, ${name}! You found all pairs in ${timeResult}! Would you like to beat the best score? If yes, just press New Game button.`)
+
+			// remove best scores div and re-populate the table
+			$('#best-scores').remove()
+			generateBestScoreBox()
+		}
+
+	} else {
+		freezeAllCards()
+
+		//after 1 sec the unmatched cards should be flipped back
+		const flipCardsBack = (arrayPairOfCards) => {
+			arrayPairOfCards[0].toggleClass('card-chamomile')
+			arrayPairOfCards[1].toggleClass('card-chamomile')
+
+			arrayPairOfCards[0].toggleClass('card-animal')
+			arrayPairOfCards[1].toggleClass('card-animal')
+
+			//get all card elements
+			const listOfCardElements = $('#game-container').children()
+			// turn on event listeners for other cards
+			for (let i = 0; i < listOfCardElements.length; i++) {
+				listOfCardElements.eq(i).on('click', flipAndCheckCard)
+			}
+		}
+		// after 1 sec call the flipCardsBack function (callback)
+		setTimeout(flipCardsBack, 1000, arrayPairOfCards)
+	}
+	//empty array for the next pair comparison
+	arrayPairOfCards = []
+}
+
+
+//timer function
+const startTimer = () => {
+	
+	let timeInSeconds = convertTimerToSeconds(timerStartsFrom)
+
+	interval = setInterval(() => {
+		timeInSeconds++
+		const timer = convertSecondsToTimer(timeInSeconds)
+		
+		// update timer on a page
+		$('#time').text(timer)
+
+	}, 1000)
+}
+
+
+const startNewGame = () => {
+	//Welcome player
+	name = prompt("Hello! Are you ready to play? What's your name?", name)
+	// if user doesn't provide a name, name him as a "player"
+	if (!name) {
+		name = "Player"
+	}
+
+	alert(`Get ready, ${name}!`)
+
+
+	//adding pair to each image and push it to the array 'arrayOfImagePairs'
+	for (let i = 0; i < images.length; i++) {
+		const card1 = images[i]
+		const card2 = images[i]
+		arrayOfImagePairs.push(card1)
+		arrayOfImagePairs.push(card2)
+	}
+
+	//shuffle array of arrayOfImagePairs
+	const shuffledarrayOfImagePairs = shuffle(arrayOfImagePairs)
+
+	generateGameCards(shuffledarrayOfImagePairs)
+	
+	//get total pairs amount
+	let numOfPairs = images.length
+
+	generateTimer()
+	generateStatusBox(numOfPairs)
+	generateNewGameButton()
+	
+	startTimer()
+
+	//flip card
+	$('.card-chamomile').on('click', flipAndCheckCard)
+
+	$('#new-game').on('click', restartGame)
+}
+
+
+const restartGame = () => {
+	// stop timer
+	clearInterval(interval)
+	// clear all elements except best scores
+	$('#timer').remove()
+	$('#status-box').remove()
+	$('#new-game').remove()
+	$('#game-container').children().remove() // card elements
+
+
+	// clear arrayOfImagePairs array and other variables
+	arrayOfImagePairs = []
+	arrayPairOfCards = []
+	shuffledarrayOfImagePairs = []
+	openedPairs = 0
+	
+	// generate new game, start new timer
+	startNewGame()
+}
+
+
+
+/* 
+<--------- Create DOM elements using jQuery --------->
+*/
+// Create cards function
+const generateCard = () => {
+	//create div for the main page
+	const $div = $('<div>')
+
+	//add a class card to the div
+	$div.addClass('card')
+	return $div
+}
+
+
 // Generate cards on the first page
 const generateMainPageCards = () => {
 	//create 15 cards for the 1st page
 	for (let i = 0; i < 15; i++) {
 
-		const $div = createCard()
+		const $div = generateCard()
 
 		//append div to the first-page-cards-container
 		$div.appendTo('#first-page-cards-container')
@@ -173,16 +363,17 @@ const generateMainPageCards = () => {
 	}
 }
 
-const generateGameCards = (shuffledCardsToDo) => {
+
+const generateGameCards = (shuffledarrayOfImagePairs) => {
 	//create game cards for the game
-	for (let i = 0; i < shuffledCardsToDo.length; i++){
+	for (let i = 0; i < shuffledarrayOfImagePairs.length; i++){
 		//create div with card class
-		const $div = createCard()
+		const $div = generateCard()
 
 		//insert image to the div card
 		const $img = $('<img>')
 		//set attribute to the image to find a file in images folder
-		$img.attr('src', `/images/${shuffledCardsToDo[i]}`)
+		$img.attr('src', `/images/${shuffledarrayOfImagePairs[i]}`)
 		$img.appendTo($div)
 
 		//replace class 'card' with 'card-chamomile' and append to the div
@@ -191,6 +382,7 @@ const generateGameCards = (shuffledCardsToDo) => {
 		$div.appendTo('#game-container')
 	}
 }
+
 
 const generateStatusBox = (numOfPairs) => {
 	//create status box
@@ -209,6 +401,7 @@ const generateStatusBox = (numOfPairs) => {
 	$divNumberPairsOpened.insertAfter($divTextPairsOpened)
 }
 
+
 const generateTimer = () => {
 	//create timer text
 	const $divTimerBox = $('<div>').attr('id', 'timer')
@@ -222,6 +415,7 @@ const generateTimer = () => {
 	$divTimerBox.prependTo('#game')
 }
 
+
 const generateNewGameButton = () => {
 	//create 'new game' button
 	const $buttonNewGame = $('<button>').attr('id', 'new-game')
@@ -229,6 +423,7 @@ const generateNewGameButton = () => {
 	$divStatusBox = $('#status-box')
 	$buttonNewGame.insertAfter($divStatusBox)
 }
+
 
 //create best score box
 const generateBestScoreBox = () => {
@@ -245,9 +440,7 @@ const generateBestScoreBox = () => {
 	$('tr').append('<th>Time:</th>')
 	$('table').append('<tbody>')
 
-	console.log(bestScores.results)
-	scores = bestScores.sortBestResults()
-	console.log(bestScores.results)
+	bestScores.sortBestResults()
 	for(let i = 0; i < bestScores.results.length; i++) {
 		$('tbody').append('<tr>')
 		// append to specific element in array of elements returned from $('tbody tr')
@@ -259,186 +452,10 @@ const generateBestScoreBox = () => {
 }
 
 
-// Flip card and check if they match
-const flipAndCheckCard = (event) => {
-	//condition prevents clicking on the same card twice in a row
-	if(isCardOpen($(event.currentTarget)) === false) {
-		console.log($(event.currentTarget))
-		//change class upon clicking
-		$(event.currentTarget).toggleClass('card-animal')
-		$(event.currentTarget).toggleClass('card-chamomile')
 
-		//add card element to the array for comparison
-		pairOfCards.push($(event.currentTarget))
-
-		//if there are 2 elements in the array, then compare if they match each other 
-		if(pairOfCards.length === 2) {
-			checkPair()
-		}
-	}
-}
-
-
-let interval
-//timer function
-const startTimer = () => {
-	
-	let timeInSeconds = convertTimerToSeconds(timerStartsFrom)
-
-	interval = setInterval(() => {
-		timeInSeconds++
-		const timer = convertSecondsToTimer(timeInSeconds)
-		
-		$('#time').text(timer)
-
-	}, 1000)
-	console.log(interval)
-}
-
-// check if all pairs are opened 
-const checkEndGame = () => {
-	if (openedPairs === cardsToDo.length / 2) {
-		return true
-	} 
-	return false 
-}
-
-const freezeAllCards = () => {
-	//get all card elements
-	const listOfCardElements = $('#game-container').children()
-	// temporarily turn off event listeners for all cards to prevent user from clicking while opened pair of cards is still opened 
-	for (let i = 0; i < listOfCardElements.length; i++) {
-		listOfCardElements.eq(i).off()
-	}
-}
-
-const checkPair = () => {
-	//get image source to compare
-	const img0src = pairOfCards[0].children().attr('src')
-	const img1src = pairOfCards[1].children().attr('src')
-
-	if(img0src === img1src) {
-		console.log('Its match')
-		//when user finds a pair of cards then user is unable to click on the opened pairs
-		pairOfCards[0].off()
-		pairOfCards[1].off()
-
-		//add one to openedPairs when user finds a match
-		openedPairs++ //openedPairs = openedPairs + 1
-		$divNumberPairsOpened.text(openedPairs)
-
-		if (checkEndGame()) {
-			clearInterval(interval)
-			let timeResult = $('#time').text()
-			bestScores.addResult(name, timeResult)
-			freezeAllCards()
-			console.log(bestScores)
-
-			Swal.fire(`Good job, ${name}! You found all pairs in ${timeResult}! Would you like to beat the best score? If yes, just press New Game button.`)
-
-			// remove best scores and re-populate the table
-			$('#best-scores').remove()
-			generateBestScoreBox()
-		}
-
-	} else {
-		freezeAllCards()
-
-		//after 1 sec the unmatched cards should be flipped back
-		const flipCardsBack = (pairOfCards) => {
-			pairOfCards[0].toggleClass('card-chamomile')
-			pairOfCards[1].toggleClass('card-chamomile')
-
-			pairOfCards[0].toggleClass('card-animal')
-			pairOfCards[1].toggleClass('card-animal')
-
-			//get all card elements
-			const listOfCardElements = $('#game-container').children()
-			// turn on event listeners for other cards
-			for (let i = 0; i < listOfCardElements.length; i++) {
-				listOfCardElements.eq(i).on('click', flipAndCheckCard)
-			}
-		}
-		setTimeout(flipCardsBack, 1000, pairOfCards)
-	}
-	//empty array for the next pair comparison
-	pairOfCards = []
-}
-
-const startNewGame = () => {
-	//Welcome player
-	name = prompt("Hello! Are you ready to play? What's your name?", name)
-	// if user doesn't provide a name, name him as a "player"
-	if (!name) {
-		name = "Player"
-	}
-
-	alert(`Get ready, ${name}!`)
-
-
-	//adding pair to each image and push it to the array 'cardsToDo'
-	for (let i = 0; i < images.length; i++) {
-		const card1 = images[i]
-		const card2 = images[i]
-		cardsToDo.push(card1)
-		cardsToDo.push(card2)
-	}
-
-	//shuffle array of cardsToDo
-	const shuffledCardsToDo = shuffle(cardsToDo)
-
-	generateGameCards(shuffledCardsToDo)
-	
-	//get total pairs amount
-	let numOfPairs = images.length
-
-	generateTimer()
-	generateStatusBox(numOfPairs)
-	generateNewGameButton()
-	
-	startTimer()
-
-	//flip card
-	$('.card-chamomile').on('click', flipAndCheckCard)
-
-	$('#new-game').on('click', restartGame)
-}
-
-
-
-const restartGame = () => {
-	// stop timer
-	clearInterval(interval)
-	// clear all elements except best scores
-	$('#timer').remove()
-	$('#status-box').remove()
-	$('#new-game').remove()
-	$('#game-container').children().remove()
-
-
-	// clear cardsToDo array and other variables
-	cardsToDo = []
-	pairOfCards = []
-	shuffledCardsToDo = []
-	openedPairs = 0
-	
-	// generate new game, start new timer
-	startNewGame()
-}
-
-
-
+// document ready function. Execution starts here.
 $(() => {
-	
-	$('#game-rules').on('click', () => {
-		Swal.fire({
-		  title: "Game rules",
-		  html: "A player has to collect all pairs of cards. <br>On each turn, a player turns over any two cards (one at a time) and keeps them if the cards match. <br>When player turns over two cards that do not match, those cards are flipped back again in the same position. <br>The trick is to remember which cards are where. <br>A player has to try to beat the best score."
-		})
-	})
-
-	generateMainPageCards()
-
+	// add event listener to Start Game button
 	$('#start-game').on('click', () => {
 		//when user clicks on "start game" the 1 st page should change
 		$('#first-page').remove()
@@ -447,6 +464,16 @@ $(() => {
 		startNewGame()
 
 	})
+
+	// add event listener to Game Rules button
+	$('#game-rules').on('click', () => {
+		Swal.fire({
+		  title: "Game rules",
+		  html: "A player has to collect all pairs of cards. <br>On each turn, a player turns over any two cards (one at a time) and keeps them if the cards match. <br>When player turns over two cards that do not match, those cards are flipped back again in the same position. <br>The trick is to remember which cards are where. <br>A player has to try to beat the best score."
+		})
+	})
+
+	generateMainPageCards()
 })
 
 
