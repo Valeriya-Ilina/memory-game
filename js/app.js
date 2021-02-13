@@ -333,7 +333,7 @@ const generateMainPageCards = () => {
 		$div.appendTo('#first-page-cards-container')
 		if (i === 0 || i === 12){
 			const $img = $('<img>')
-			$img.attr('src', '/images/first-page pic.jpg')
+			$img.attr('src', 'images/first-page pic.jpg')
 			$img.appendTo($div)
 		}
 		if (i === 1){
@@ -373,7 +373,7 @@ const generateGameCards = (shuffledarrayOfImagePairs) => {
 		//insert image to the div card
 		const $img = $('<img>')
 		//set attribute to the image to find a file in images folder
-		$img.attr('src', `/images/${shuffledarrayOfImagePairs[i]}`)
+		$img.attr('src', `images/${shuffledarrayOfImagePairs[i]}`)
 		$img.appendTo($div)
 
 		//replace class 'card' with 'card-chamomile' and append to the div
