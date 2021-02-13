@@ -1,4 +1,4 @@
-console.log("Memory Game1")
+console.log("Memory Game")
 
 //track user name
 let name
@@ -24,7 +24,8 @@ const bestScores = {
 	results: [
 		{name: 'Andre', time: '06:45'},
 		{name: 'Sandra', time: '02:50'},
-		{name: 'Alexander-Arnold', time: '01:50'}
+		{name: 'Alexander-Arnold', time: '10:50'},
+		{name: 'Savka', time: '01:50'}
 	],
 
 	addResult(name, time) {
@@ -34,7 +35,7 @@ const bestScores = {
 		}
 
 		this.sortBestResults()
-		if (this.results.length <= 4 || this.isNewResultFasterThanLastInArray(time)) {
+		if (this.results.length <= 5 || this.isNewResultFasterThanFifthInArray(time)) {
 			this.results.push(resultObject)
 			this.sortBestResults()
 			if(this.results.length > 5) {
@@ -47,7 +48,7 @@ const bestScores = {
 		this.results.pop()
 	},
 
-	isNewResultFasterThanLastInArray(time) {
+	isNewResultFasterThanFifthInArray(time) {
 		if (this.results.length === 5) {
 			if(convertTimerToSeconds(time) < convertTimerToSeconds(this.results[4].time)) {
 				return true
@@ -233,7 +234,7 @@ const generateNewGameButton = () => {
 const generateBestScoreBox = () => {
 	const $divBestScore = $('<div>').attr('id', 'best-scores')
 	$divBestScore.text('BEST SCORES')
-	$divBestScore.appendTo($('#side-box'))
+	$divBestScore.prependTo($('#side-box'))
 
 	//create table in best score box
 	$divBestScore.append("<table>")
@@ -333,7 +334,7 @@ const checkPair = () => {
 			freezeAllCards()
 			console.log(bestScores)
 
-			Swal.fire(`Good job, ${name}! You found all pairs in ${timeResult}`)
+			Swal.fire(`Good job, ${name}! You found all pairs in ${timeResult}! Would you like to beat the best score? If yes, just press New Game button.`)
 
 			// remove best scores and re-populate the table
 			$('#best-scores').remove()
@@ -366,13 +367,13 @@ const checkPair = () => {
 
 const startNewGame = () => {
 	//Welcome player
-	// name = prompt("Hello! Are you ready to play? What's your name?")
-	//if user doesn't provide a name, name him as a "player"
+	name = prompt("Hello! Are you ready to play? What's your name?", name)
+	// if user doesn't provide a name, name him as a "player"
 	if (!name) {
 		name = "Player"
 	}
 
-	// alert(`Get ready, ${name}!`)
+	alert(`Get ready, ${name}!`)
 
 
 	//adding pair to each image and push it to the array 'cardsToDo'
@@ -432,7 +433,7 @@ $(() => {
 	$('#game-rules').on('click', () => {
 		Swal.fire({
 		  title: "Game rules",
-		  text: "You've got 36 cards and need to find pairs"
+		  html: "A player has to collect all pairs of cards. <br>On each turn, a player turns over any two cards (one at a time) and keeps them if the cards match. <br>When player turns over two cards that do not match, those cards are flipped back again in the same position. <br>The trick is to remember which cards are where. <br>A player has to try to beat the best score."
 		})
 	})
 
@@ -447,13 +448,5 @@ $(() => {
 
 	})
 })
-
-
-
-
-
-
-
-
 
 

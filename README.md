@@ -3,15 +3,13 @@
 
 ## What project is? Why I made it?
 
-My project is a Memory Game. Playing memory game can improve an attention, concentration and focus. Memory game gives space to critical thinking and that helps people to develop their attention to detail, also this game can improve visual recognition. Plus, I love playing memory game.
+My project is a Memory Game. Playing memory game can improve an attention, concentration and focus. Memory game gives space to critical thinking and that helps people to develop their attention to detail, also this game can improve visual recognition. Plus, I love playing memory games.
 
 
 ## User stories:
 
 - As a user, I should be able to see the 1st page with the name of the game and game rules.
-
 - As a user, I should be able to click on start game button and get player's name.
-
 - As a user, I should be able to click on the button with rules of the game.
 
 - As a user, I should be able to start a new memory game.
@@ -35,8 +33,8 @@ My project is a Memory Game. Playing memory game can improve an attention, conce
 
 ##  Wireframes: 
 
- [wireframe1.HEIF](/images/wireframe1.HEIF)
- [wireframe2.HEIF](/images/wireframe2.HEIF) 
+ ![wireframe1.jpg](/images/wireframe1.jpg)
+ ![wireframe2.jpg](/images/wireframe2.jpg)
 
 
 ##  Technologies used: 
@@ -54,7 +52,9 @@ My project is a Memory Game. Playing memory game can improve an attention, conce
 
 ## Forthcoming features:
 
-- Animation
+- Card flip animation
+
+- Highlight newly opened pair of cards in Status box
 
 - Set different game levels and ability to increase the amount of cards each level
 
