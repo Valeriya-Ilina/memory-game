@@ -35,7 +35,8 @@ My project is a Memory Game. Playing memory game can improve an attention, conce
 
 ##  Wireframes: 
 
-<!-- ![dog developer](http://i1.kym-cdn.com/photos/images/original/000/234/765/b7e.jpg) -->
+ [wireframe1.HEIF](/images/wireframe1.HEIF)
+ [wireframe2.HEIF](/images/wireframe2.HEIF) 
 
 
 ##  Technologies used: 
